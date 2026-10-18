@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sudoku 数独 | Runchang Tian</title>
+<style>
+  :root {
+    --bg: #f7f5f2;
+    --card: #ffffff;
+    --text: #1f2328;
+    --muted: #6b7280;
+    --accent: #3b6ef5;
+    --line: #d5d8de;
+    --strong: #1f2328;
+    --given: #1f2328;
+    --mine: #3b6ef5;
+    --related: #eef1f8;
+    --same: #d9e3ff;
+    --sel: #bcd0ff;
+    --bad: #e5393c;
+    --bad-bg: #ffe3e3;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14161a;
+      --card: #1c1f25;
+      --text: #eceef1;
+      --muted: #9aa1ad;
+      --accent: #7c9bff;
+      --line: #3a3f49;
+      --strong: #cfd3da;
+      --given: #eceef1;
+      --mine: #8fb0ff;
+      --related: #232834;
+      --same: #2f3b5c;
+      --sel: #3d4f84;
+      --bad: #ff6b6e;
+      --bad-bg: #4a2427;
+    }
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+    padding: env(safe-area-inset-top, 0) 0 env(safe-area-inset-bottom, 0);
+  }
+  .wrap { max-width: 480px; margin: 0 auto; padding: 20px 14px 40px; }
+  .back { color: var(--accent); text-decoration: none; font-size: 14px; }
+  h1 { margin: 10px 0 2px; font-size: 26px; }
+  .sub { color: var(--muted); font-size: 14px; margin: 0 0 14px; }
+
+  .bar { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+  .levels { display: flex; gap: 6px; }
+  .levels button, .tool, .newbtn {
+    font: inherit; font-size: 14px; color: var(--text); background: var(--card);
+    border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; cursor: pointer;
+  }
+  .levels button.on { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .stats { color: var(--muted); font-size: 14px; display: flex; gap: 12px; }
+  .stats b { color: var(--text); font-weight: 600; }
+
+  .board {
+    display: grid; grid-template-columns: repeat(9, 1fr);
+    width: 100%; aspect-ratio: 1; background: var(--card);
+    border: 2px solid var(--strong); border-radius: 6px; overflow: hidden;
+  }
+  .cell {
+    font: inherit; font-size: clamp(18px, 6vw, 28px); color: var(--mine);
+    background: var(--card); border: 0; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line);
+    padding: 0; display: flex; align-items: center; justify-content: center;
+    cursor: pointer; user-select: none; min-width: 0;
+  }
+  .cell.cr { border-right: 2px solid var(--strong); }
+  .cell.cb { border-bottom: 2px solid var(--strong); }
+  .cell.c8 { border-right: 0; }
+  .cell.r8 { border-bottom: 0; }
+  .cell.given { color: var(--given); font-weight: 700; }
+  .cell.related { background: var(--related); }
+  .cell.same { background: var(--same); }
+  .cell.selected { background: var(--sel); }
+  .cell.wrong { color: var(--bad); background: var(--bad-bg); font-weight: 700; }
+  .cell.wrong.selected { background: var(--bad-bg); box-shadow: inset 0 0 0 2px var(--bad); }
+
+  .msg { min-height: 22px; margin: 10px 2px 6px; font-size: 14px; color: var(--muted); text-align: center; }
+  .msg.bad { color: var(--bad); font-weight: 600; }
+
+  .pad { display: grid; grid-template-columns: repeat(9, 1fr); gap: 5px; margin-top: 6px; }
+  .pad button {
+    font: inherit; font-size: clamp(18px, 5.5vw, 26px); color: var(--accent);
+    background: var(--card); border: 1px solid var(--line); border-radius: 8px;
+    padding: 10px 0; cursor: pointer;
+  }
+  .pad button:disabled { opacity: .25; cursor: default; }
+  .tools { display: flex; justify-content: center; gap: 10px; margin-top: 12px; }
+
+  .overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,.55); display: none;
+    align-items: center; justify-content: center; z-index: 10; padding: 20px;
+  }
+  .overlay.open { display: flex; }
+  .dialog { background: var(--card); border-radius: 16px; padding: 26px 28px; text-align: center; max-width: 320px; }
+  .dialog h2 { margin: 0 0 8px; font-size: 24px; }
+  .dialog p { margin: 0 0 18px; color: var(--muted); line-height: 1.6; }
+  .newbtn { background: var(--accent); color: #fff; border-color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="./">← Home</a>
+  <h1>Sudoku 数独</h1>
+  <p class="sub">每次随机生成一局。填错的数字会变红,改对为止。</p>
+
+  <div class="bar">
+    <div class="levels" id="levels">
+      <button data-level="easy">简单</button>
+      <button data-level="medium" class="on">中等</button>
+      <button data-level="hard">困难</button>
+    </div>
+    <div class="stats">
+      <span>用时 <b id="time">00:00</b></span>
+      <span>错误 <b id="mistakes">0</b></span>
+    </div>
+  </div>
+
+  <div class="board" id="board"></div>
+  <div class="msg" id="msg"></div>
+  <div class="pad" id="pad"></div>
+
+  <div class="tools">
+    <button class="tool" id="erase">擦除</button>
+    <button class="tool" id="hint">提示</button>
+    <button class="tool" id="restart">新游戏</button>
+  </div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="dialog">
+    <h2>完成了!</h2>
+    <p id="winText"></p>
+    <button class="newbtn" id="again">再来一局</button>
+  </div>
+</div>
+
+<script>
+  // ---- logic ----
+  function shuffle(a) {
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function candidates(b, i) {
+    const r = Math.floor(i / 9), c = i % 9;
+    const used = new Array(10).fill(false);
+    for (let k = 0; k < 9; k++) {
+      used[b[r * 9 + k]] = true;
+      used[b[k * 9 + c]] = true;
+    }
+    const br = r - (r % 3), bc = c - (c % 3);
+    for (let y = 0; y < 3; y++) for (let x = 0; x < 3; x++) used[b[(br + y) * 9 + bc + x]] = true;
+    const list = [];
+    for (let v = 1; v <= 9; v++) if (!used[v]) list.push(v);
+    return list;
+  }
+
+  // 找候选数最少的空格
+  function nextCell(b) {
+    let best = -1, bestList = null;
+    for (let i = 0; i < 81; i++) {
+      if (b[i] !== 0) continue;
+      const list = candidates(b, i);
+      if (list.length === 0) return { i, list };
+      if (!bestList || list.length < bestList.length) {
+        best = i; bestList = list;
+        if (list.length === 1) break;
+      }
+    }
+    return best === -1 ? null : { i: best, list: bestList };
+  }
+
+  function countSolutions(b, limit) {
+    let count = 0;
+    (function rec() {
+      if (count >= limit) return;
+      const nc = nextCell(b);
+      if (!nc) { count++; return; }
+      for (const v of nc.list) {
+        b[nc.i] = v;
+        rec();
+        if (count >= limit) { b[nc.i] = 0; return; }
+      }
+      b[nc.i] = 0;
+    })();
+    return count;
+  }
+
+  function generateSolution() {
+    const b = new Array(81).fill(0);
+    (function fill() {
+      const nc = nextCell(b);
+      if (!nc) return true;
+      for (const v of shuffle(nc.list.slice())) {
+        b[nc.i] = v;
+        if (fill()) return true;
+      }
+      b[nc.i] = 0;
+      return false;
+    })();
+    return b;
+  }
+
+  // 逐个挖空,每次保证题目只有唯一解
+  function makePuzzle(solution, clues) {
+    const p = solution.slice();
+    let left = 81;
+    const order = shuffle(Array.from({ length: 81 }, (_, i) => i));
+    for (const i of order) {
+      if (left <= clues) break;
+      const keep = p[i];
+      p[i] = 0;
+      if (countSolutions(p.slice(), 2) !== 1) p[i] = keep;
+      else left--;
+    }
+    return p;
+  }
+  // ---- end logic ----
+
+  const CLUES = { easy: 40, medium: 32, hard: 27 };
+  let level = "medium";
+  let solution, values, given, wrong;
+  let sel = -1, mistakes = 0, finished = false;
+  let startTime = 0, timerId = null;
+
+  const $ = id => document.getElementById(id);
+  const boardEl = $("board"), padEl = $("pad"), msgEl = $("msg");
+  const cells = [];
+
+  // 建棋盘
+  for (let i = 0; i < 81; i++) {
+    const r = Math.floor(i / 9), c = i % 9;
+    const b = document.createElement("button");
+    b.className = "cell" +
+      (c % 3 === 2 && c !== 8 ? " cr" : "") +
+      (r % 3 === 2 && r !== 8 ? " cb" : "") +
+      (c === 8 ? " c8" : "") + (r === 8 ? " r8" : "");
+    b.addEventListener("click", () => { sel = i; render(); });
+    boardEl.appendChild(b);
+    cells.push(b);
+  }
+  // 建数字键
+  const padBtns = [];
+  for (let n = 1; n <= 9; n++) {
+    const b = document.createElement("button");
+    b.textContent = n;
+    b.addEventListener("click", () => input(n));
+    padEl.appendChild(b);
+    padBtns.push(b);
+  }
+
+  function setMsg(text, bad) {
+    msgEl.textContent = text || "";
+    msgEl.className = "msg" + (bad ? " bad" : "");
+  }
+
+  function newGame() {
+    msgEl.textContent = "正在生成…";
+    // 让“正在生成”先显示出来
+    setTimeout(() => {
+      solution = generateSolution();
+      const puzzle = makePuzzle(solution, CLUES[level]);
+      values = puzzle.slice();
+      given = puzzle.map(v => v !== 0);
+      wrong = new Array(81).fill(false);
+      sel = values.findIndex(v => v === 0);
+      mistakes = 0;
+      finished = false;
+      $("overlay").classList.remove("open");
+      $("mistakes").textContent = "0";
+      setMsg("");
+      startTimer();
+      render();
+    }, 20);
+  }
+
+  function startTimer() {
+    clearInterval(timerId);
+    startTime = Date.now();
+    $("time").textContent = "00:00";
+    timerId = setInterval(() => {
+      const s = Math.floor((Date.now() - startTime) / 1000);
+      $("time").textContent = fmt(s);
+    }, 500);
+  }
+  function fmt(s) {
+    return String(Math.floor(s / 60)).padStart(2, "0") + ":" + String(s % 60).padStart(2, "0");
+  }
+
+  function input(n) {
+    if (finished || sel < 0) return;
+    if (given[sel]) return;
+    if (values[sel] !== 0 && !wrong[sel]) return; // 已经填对的格子锁定
+    values[sel] = n;
+    if (n !== solution[sel]) {
+      wrong[sel] = true;
+      mistakes++;
+      $("mistakes").textContent = mistakes;
+      setMsg("这个数字不对,已标红,请重新填写", true);
+    } else {
+      wrong[sel] = false;
+      setMsg("");
+    }
+    render();
+    checkWin();
+  }
+
+  function erase() {
+    if (finished || sel < 0) return;
+    if (wrong[sel]) {
+      values[sel] = 0;
+      wrong[sel] = false;
+      setMsg("");
+      render();
+    }
+  }
+
+  function hint() {
+    if (finished || sel < 0 || given[sel]) return;
+    if (values[sel] !== 0 && !wrong[sel]) return;
+    values[sel] = solution[sel];
+    wrong[sel] = false;
+    setMsg("已填入正确答案");
+    render();
+    checkWin();
+  }
+
+  function checkWin() {
+    if (values.every((v, i) => v === solution[i])) {
+      finished = true;
+      clearInterval(timerId);
+      const s = Math.floor((Date.now() - startTime) / 1000);
+      $("winText").textContent = "用时 " + fmt(s) + ",填错 " + mistakes + " 次。";
+      $("overlay").classList.add("open");
+    }
+  }
+
+  function render() {
+    const selVal = sel >= 0 && !wrong[sel] ? values[sel] : 0;
+    const sr = sel >= 0 ? Math.floor(sel / 9) : -1;
+    const sc = sel >= 0 ? sel % 9 : -1;
+    for (let i = 0; i < 81; i++) {
+      const el = cells[i];
+      const r = Math.floor(i / 9), c = i % 9;
+      el.textContent = values[i] === 0 ? "" : values[i];
+      let cls = el.className.replace(/\b(given|related|same|selected|wrong)\b/g, "").replace(/\s+/g, " ").trim();
+      if (given[i]) cls += " given";
+      if (wrong[i]) cls += " wrong";
+      if (sel >= 0) {
+        const sameBox = Math.floor(r / 3) === Math.floor(sr / 3) && Math.floor(c / 3) === Math.floor(sc / 3);
+        if (i === sel) cls += " selected";
+        else if (selVal && values[i] === selVal && !wrong[i]) cls += " same";
+        else if (r === sr || c === sc || sameBox) cls += " related";
+      }
+      el.className = cls;
+    }
+    // 某个数字已经全部填对,则把该数字键置灰
+    for (let n = 1; n <= 9; n++) {
+      let cnt = 0;
+      for (let i = 0; i < 81; i++) if (values[i] === n && !wrong[i]) cnt++;
+      padBtns[n - 1].disabled = cnt >= 9;
+    }
+  }
+
+  // 键盘操作
+  document.addEventListener("keydown", e => {
+    if (e.key >= "1" && e.key <= "9") { input(Number(e.key)); return; }
+    if (e.key === "Backspace" || e.key === "Delete" || e.key === "0") { erase(); return; }
+    const move = { ArrowUp: -9, ArrowDown: 9, ArrowLeft: -1, ArrowRight: 1 }[e.key];
+    if (move !== undefined && sel >= 0) {
+      e.preventDefault();
+      const r = Math.floor(sel / 9), c = sel % 9;
+      if (e.key === "ArrowUp" && r === 0) return;
+      if (e.key === "ArrowDown" && r === 8) return;
+      if (e.key === "ArrowLeft" && c === 0) return;
+      if (e.key === "ArrowRight" && c === 8) return;
+      sel += move;
+      render();
+    }
+  });
+
+  $("erase").addEventListener("click", erase);
+  $("hint").addEventListener("click", hint);
+  $("restart").addEventListener("click", newGame);
+  $("again").addEventListener("click", newGame);
+  document.querySelectorAll("#levels button").forEach(btn => {
+    btn.addEventListener("click", () => {
+      level = btn.dataset.level;
+      document.querySelectorAll("#levels button").forEach(b => b.classList.toggle("on", b === btn));
+      newGame();
+    });
+  });
+
+  newGame();
+</script>
+</body>
+</html>
