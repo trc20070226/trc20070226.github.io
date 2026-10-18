@@ -95,11 +95,13 @@
 
   // "2026-10-18-boston-sunset.jpg" -> "boston sunset"
   function makeCaption(filename) {
-    return filename
+    const cap = filename
       .replace(/\.[^.]+$/, "")
       .replace(/^\d{4}[-_.]?\d{2}[-_.]?\d{2}[-_ ]*/, "")
       .replace(/[-_]+/g, " ")
       .trim();
+    // 只剩数字编号(如 01)的不显示说明
+    return /^\d+$/.test(cap) ? "" : cap;
   }
 
   async function loadPhotos() {
