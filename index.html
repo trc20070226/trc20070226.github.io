@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Runchang Tian</title>
+<style>
+  :root {
+    --bg: #f7f5f2;
+    --card: #ffffff;
+    --text: #1f2328;
+    --muted: #6b7280;
+    --accent: #3b6ef5;
+    --line: #e5e7eb;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14161a;
+      --card: #1c1f25;
+      --text: #eceef1;
+      --muted: #9aa1ad;
+      --accent: #7c9bff;
+      --line: #2b2f37;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, "Helvetica Neue", "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+    line-height: 1.65;
+    padding: env(safe-area-inset-top, 0) 0 env(safe-area-inset-bottom, 0);
+  }
+  .wrap { max-width: 680px; margin: 0 auto; padding: 32px 20px 60px; }
+  .hero { text-align: center; padding: 24px 0 4px; }
+  h1 { margin: 0 0 6px; font-size: 32px; letter-spacing: .5px; }
+  .tagline { color: var(--muted); margin: 0; }
+  .links { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 16px; }
+  .links a {
+    color: var(--accent); text-decoration: none; font-size: 14px;
+    border: 1px solid var(--line); background: var(--card);
+    padding: 6px 14px; border-radius: 999px;
+  }
+  .badge {
+    display: inline-block; margin-top: 14px; font-size: 13px;
+    background: var(--accent); color: #fff; padding: 4px 12px; border-radius: 999px;
+  }
+  .card {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 16px; padding: 20px 22px; margin-top: 20px;
+  }
+  h2 { margin: 0 0 14px; font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--accent); }
+  .item { margin-bottom: 18px; }
+  .item:last-child { margin-bottom: 0; }
+  .row { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .title { font-weight: 600; }
+  .meta { color: var(--muted); font-size: 14px; }
+  ul { margin: 6px 0 0; padding-left: 20px; }
+  li { margin-bottom: 4px; }
+  .tags { display: flex; flex-wrap: wrap; gap: 8px; }
+  .tags span {
+    background: var(--bg); border: 1px solid var(--line);
+    padding: 4px 12px; border-radius: 999px; font-size: 14px;
+  }
+  .skill-row { margin-bottom: 12px; }
+  .skill-row:last-child { margin-bottom: 0; }
+  .skill-label { color: var(--muted); font-size: 14px; margin-bottom: 6px; }
+  footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 32px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <h1>Runchang Tian</h1>
+    <p class="tagline">Computer Science &amp; Mathematics · Northeastern University · Boston, MA</p>
+    <span class="badge">Co-op available January–September 2027</span>
+    <div class="links">
+      <a href="mailto:tian.run@northeastern.edu">tian.run@northeastern.edu</a>
+      <a href="https://github.com/trc20070226" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </header>
+
+  <section class="card">
+    <h2>Education</h2>
+    <div class="item">
+      <div class="row">
+        <div class="title">Northeastern University</div>
+        <div class="meta">Expected August 2029</div>
+      </div>
+      <div class="meta">Boston, MA · Candidate for B.S. in Computer Science and Mathematics</div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Technical Knowledge</h2>
+    <div class="skill-row">
+      <div class="skill-label">Programming</div>
+      <div class="tags"><span>Java</span><span>Python</span><span>C#</span></div>
+    </div>
+    <div class="skill-row">
+      <div class="skill-label">Development</div>
+      <div class="tags"><span>Unity</span><span>Blender</span><span>GitHub</span><span>Microsoft Office</span></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Project Experience</h2>
+
+    <div class="item">
+      <div class="row">
+        <div class="title">Pokémon: Catch Psyduck Game — Game Developer</div>
+        <div class="meta">Sep. 2026 – Present</div>
+      </div>
+      <div class="meta">Boston, MA</div>
+      <ul>
+        <li>Developing a 3D game for CS2386 Game Design using Unity and C#, implementing gameplay mechanics, player interaction, and game systems.</li>
+        <li>Creating and integrating 3D assets with Blender while iterating on game design, level structure, and interactive features.</li>
+      </ul>
+    </div>
+
+    <div class="item">
+      <div class="row">
+        <div class="title">INEON “Dianhong Youth” Public Speaking Program — Co-Founder</div>
+        <div class="meta">Jun. 2024 – Present</div>
+      </div>
+      <div class="meta">China</div>
+      <ul>
+        <li>Co-founded a youth public-speaking platform focused on academic interests, personal development, and social-impact topics; led strategy and program development.</li>
+        <li>Coordinated teams across 8+ provinces/regions, visiting 40+ schools and reaching 10,000+ students through speeches, workshops, and interactive seminars.</li>
+      </ul>
+    </div>
+
+    <div class="item">
+      <div class="row">
+        <div class="title">Sudoku Club — Vice President</div>
+        <div class="meta">Sep. 2022 – Jun. 2024</div>
+      </div>
+      <div class="meta">Beijing, China</div>
+      <ul>
+        <li>Led club members in cultural festivals and the 2023 Beijing Sudoku Competition, coordinating preparation, participation, and team activities.</li>
+        <li>Organized an online exchange with Sudoku experts in June 2023, inspiring 30+ members who subsequently received competition awards and recognition.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Work Experience</h2>
+
+    <div class="item">
+      <div class="row">
+        <div class="title">CSSA Student Association — Event &amp; Media Coordinator</div>
+        <div class="meta">Sep. 2025 – Present</div>
+      </div>
+      <div class="meta">Boston, MA</div>
+      <ul>
+        <li>Produced photography, street-interview, and event content; interviewed 20+ students about attitudes toward relationships and organized follow-up social activities.</li>
+        <li>Coordinated Halloween, birthday, and other student parties with 200+ total attendees, supporting event logistics, promotion, and community engagement.</li>
+      </ul>
+    </div>
+
+    <div class="item">
+      <div class="row">
+        <div class="title">L.R. Shiling Club — Vice President</div>
+        <div class="meta">Sep. 2022 – Sep. 2024</div>
+      </div>
+      <div class="meta">Beijing, China</div>
+      <ul>
+        <li>Recruited and coordinated 500+ student volunteers from multiple Beijing high schools to support children with hearing impairments.</li>
+        <li>Organized 2 large-scale charity concerts and managed volunteer coordination, publicity, and event operations, directing proceeds to hearing-impaired children’s programs.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Interests</h2>
+    <div class="tags">
+      <span>Basketball</span><span>Singing</span><span>Photography</span><span>Travel</span><span>Board Games</span>
+    </div>
+  </section>
+
+  <footer>© Runchang Tian</footer>
+</div>
+</body>
+</html>
