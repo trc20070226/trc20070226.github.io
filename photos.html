@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Photography | Runchang Tian</title>
+<style>
+  :root {
+    --bg: #f7f5f2;
+    --card: #ffffff;
+    --text: #1f2328;
+    --muted: #6b7280;
+    --accent: #3b6ef5;
+    --line: #e5e7eb;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14161a;
+      --card: #1c1f25;
+      --text: #eceef1;
+      --muted: #9aa1ad;
+      --accent: #7c9bff;
+      --line: #2b2f37;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, "Helvetica Neue", "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+    line-height: 1.6;
+    padding: env(safe-area-inset-top, 0) 0 env(safe-area-inset-bottom, 0);
+  }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 28px 16px 60px; }
+  .back { color: var(--accent); text-decoration: none; font-size: 14px; }
+  h1 { margin: 12px 0 4px; font-size: 30px; }
+  .sub { color: var(--muted); margin: 0 0 24px; }
+  .grid { columns: 2 160px; column-gap: 10px; }
+  @media (min-width: 700px) { .grid { columns: 3 200px; } }
+  .grid figure { margin: 0 0 10px; break-inside: avoid; cursor: zoom-in; }
+  .grid img {
+    width: 100%; display: block; border-radius: 10px;
+    background: var(--line); min-height: 80px;
+  }
+  .grid figcaption { font-size: 13px; color: var(--muted); padding: 4px 2px 0; }
+  .status { color: var(--muted); text-align: center; padding: 40px 0; }
+
+  .lightbox {
+    position: fixed; inset: 0; background: rgba(0,0,0,.92);
+    display: none; align-items: center; justify-content: center;
+    flex-direction: column; z-index: 100; padding: 16px;
+  }
+  .lightbox.open { display: flex; }
+  .lightbox img { max-width: 100%; max-height: 82vh; border-radius: 6px; }
+  .lightbox .cap { color: #ddd; margin-top: 12px; font-size: 14px; text-align: center; }
+  .lightbox button {
+    position: absolute; background: rgba(255,255,255,.12); color: #fff;
+    border: 0; border-radius: 999px; width: 44px; height: 44px; font-size: 22px; cursor: pointer;
+  }
+  .lb-close { top: calc(16px + env(safe-area-inset-top, 0px)); right: 16px; }
+  .lb-prev { left: 12px; top: 50%; }
+  .lb-next { right: 12px; top: 50%; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="./">← Home</a>
+  <h1>Photography</h1>
+  <p class="sub">Moments from Boston, China, and the places in between.</p>
+
+  <div id="grid" class="grid"></div>
+  <p id="status" class="status">Loading photos…</p>
+</div>
+
+<div id="lightbox" class="lightbox">
+  <button class="lb-close" id="lbClose" aria-label="Close">×</button>
+  <button class="lb-prev" id="lbPrev" aria-label="Previous">‹</button>
+  <button class="lb-next" id="lbNext" aria-label="Next">›</button>
+  <img id="lbImg" alt="">
+  <div class="cap" id="lbCap"></div>
+</div>
+
+<script>
+  // ====== Settings (change only if your repo or folder name changes) ======
+  const OWNER  = "trc20070226";
+  const REPO   = "trc20070226.github.io";
+  const FOLDER = "photos";
+  // ========================================================================
+
+  const grid = document.getElementById("grid");
+  const statusEl = document.getElementById("status");
+  let photos = [];
+  let current = 0;
+
+  // "2026-10-18-boston-sunset.jpg" -> "boston sunset"
+  function makeCaption(filename) {
+    return filename
+      .replace(/\.[^.]+$/, "")
+      .replace(/^\d{4}[-_.]?\d{2}[-_.]?\d{2}[-_ ]*/, "")
+      .replace(/[-_]+/g, " ")
+      .trim();
+  }
+
+  async function loadPhotos() {
+    try {
+      const res = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/contents/${FOLDER}`);
+      if (res.status === 404) {
+        statusEl.textContent = "No photos yet. Upload some into the “photos” folder.";
+        return;
+      }
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const files = await res.json();
+      photos = files
+        .filter(f => f.type === "file" && /\.(jpe?g|png|webp|gif)$/i.test(f.name))
+        .sort((a, b) => b.name.localeCompare(a.name)) // newest date first
+        .map(f => ({
+          src: `${FOLDER}/${encodeURIComponent(f.name)}`,
+          caption: makeCaption(f.name)
+        }));
+
+      if (photos.length === 0) {
+        statusEl.textContent = "No photos yet. Upload some into the “photos” folder.";
+        return;
+      }
+      statusEl.style.display = "none";
+      photos.forEach((p, i) => {
+        const fig = document.createElement("figure");
+        const img = document.createElement("img");
+        img.src = p.src;
+        img.alt = p.caption || "Photo";
+        img.loading = "lazy";
+        fig.appendChild(img);
+        if (p.caption) {
+          const cap = document.createElement("figcaption");
+          cap.textContent = p.caption;
+          fig.appendChild(cap);
+        }
+        fig.addEventListener("click", () => openBox(i));
+        grid.appendChild(fig);
+      });
+    } catch (err) {
+      statusEl.textContent = "Couldn’t load photos right now. Please try again in a moment.";
+    }
+  }
+
+  // ----- Lightbox -----
+  const box = document.getElementById("lightbox");
+  const lbImg = document.getElementById("lbImg");
+  const lbCap = document.getElementById("lbCap");
+
+  function show(i) {
+    current = (i + photos.length) % photos.length;
+    lbImg.src = photos[current].src;
+    lbCap.textContent = photos[current].caption;
+  }
+  function openBox(i) { show(i); box.classList.add("open"); }
+  function closeBox() { box.classList.remove("open"); }
+
+  document.getElementById("lbClose").addEventListener("click", closeBox);
+  document.getElementById("lbPrev").addEventListener("click", e => { e.stopPropagation(); show(current - 1); });
+  document.getElementById("lbNext").addEventListener("click", e => { e.stopPropagation(); show(current + 1); });
+  box.addEventListener("click", e => { if (e.target === box) closeBox(); });
+  document.addEventListener("keydown", e => {
+    if (!box.classList.contains("open")) return;
+    if (e.key === "Escape") closeBox();
+    if (e.key === "ArrowLeft") show(current - 1);
+    if (e.key === "ArrowRight") show(current + 1);
+  });
+
+  loadPhotos();
+</script>
+</body>
+</html>
