@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>人大附中点虹青年演讲计划 | 宣传册</title>
+<style>
+  :root {
+    --bg: #f2f1ee;
+    --text: #1f2328;
+    --muted: #6b7280;
+    --accent: #3b6ef5;
+    --line: #e5e7eb;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #101114;
+      --text: #eceef1;
+      --muted: #9aa1ad;
+      --accent: #7c9bff;
+      --line: #2b2f37;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+    padding: env(safe-area-inset-top, 0) 0 env(safe-area-inset-bottom, 0);
+  }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 20px 12px 48px; }
+  header { padding: 4px 4px 16px; }
+  .back { color: var(--accent); text-decoration: none; font-size: 14px; }
+  h1 { font-size: 22px; margin: 10px 0 4px; line-height: 1.35; }
+  .sub { color: var(--muted); font-size: 14px; margin: 0 0 12px; }
+  .btn {
+    display: inline-block; color: var(--accent); text-decoration: none; font-size: 14px;
+    border: 1px solid var(--line); padding: 6px 14px; border-radius: 999px;
+  }
+  .page { margin: 0 0 12px; }
+  .page img {
+    width: 100%; height: auto; display: block; border-radius: 8px;
+    background: var(--line); box-shadow: 0 2px 12px rgba(0,0,0,.12);
+  }
+  .num { text-align: center; color: var(--muted); font-size: 12px; margin-top: 4px; }
+  footer { text-align: center; color: var(--muted); font-size: 13px; padding-top: 16px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a class="back" href="./">← Home</a>
+    <h1>人大附中点虹青年演讲计划</h1>
+    <p class="sub">RDFZ iNeon Youth Speakers Initiative · 宣传册</p>
+    <a class="btn" href="dianhong.pdf" download>下载 PDF</a>
+  </header>
+
+  <main id="pages"></main>
+
+  <footer>© Runchang Tian</footer>
+</div>
+
+<script>
+  // 宣传册总页数;图片放在 dianhong/ 文件夹,命名为 p-01.jpg、p-02.jpg ...
+  const TOTAL = 20;
+  const box = document.getElementById("pages");
+  for (let i = 1; i <= TOTAL; i++) {
+    const n = String(i).padStart(2, "0");
+    const fig = document.createElement("div");
+    fig.className = "page";
+    const img = document.createElement("img");
+    img.src = "dianhong/p-" + n + ".jpg";
+    img.alt = "宣传册第 " + i + " 页";
+    img.loading = i <= 2 ? "eager" : "lazy";
+    const num = document.createElement("div");
+    num.className = "num";
+    num.textContent = i + " / " + TOTAL;
+    fig.appendChild(img);
+    fig.appendChild(num);
+    box.appendChild(fig);
+  }
+</script>
+</body>
+</html>
