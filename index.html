@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Runchang Tian</title>
+<style>
+  :root {
+    --bg: #f7f5f2;
+    --card: #ffffff;
+    --text: #1f2328;
+    --muted: #6b7280;
+    --accent: #3b6ef5;
+    --line: #e5e7eb;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14161a;
+      --card: #1c1f25;
+      --text: #eceef1;
+      --muted: #9aa1ad;
+      --accent: #7c9bff;
+      --line: #2b2f37;
+    }
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, "Helvetica Neue", "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+    line-height: 1.6;
+    padding: env(safe-area-inset-top, 0) 0 env(safe-area-inset-bottom, 0);
+  }
+  .wrap { max-width: 560px; margin: 0 auto; padding: 40px 18px 60px; }
+  .hero { text-align: center; padding-bottom: 8px; }
+  h1 { margin: 0 0 6px; font-size: 34px; letter-spacing: .5px; }
+  .tagline { color: var(--muted); margin: 0; }
+  .badge {
+    display: inline-block; margin-top: 14px; font-size: 13px;
+    background: var(--accent); color: #fff; padding: 4px 12px; border-radius: 999px;
+  }
+  .menu { display: grid; gap: 14px; margin-top: 28px; }
+  .item {
+    display: flex; align-items: center; gap: 16px;
+    background: var(--card); border: 1px solid var(--line); border-radius: 16px;
+    padding: 16px 18px; text-decoration: none; color: inherit;
+    transition: transform .12s ease, box-shadow .12s ease;
+  }
+  .item:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(0,0,0,.10); }
+  .item:active { transform: scale(.99); }
+  .icon {
+    flex: 0 0 52px; height: 52px; border-radius: 14px; background: var(--bg);
+    display: flex; align-items: center; justify-content: center; font-size: 26px;
+  }
+  .text { flex: 1; min-width: 0; }
+  .name { font-weight: 600; font-size: 17px; }
+  .desc { color: var(--muted); font-size: 14px; }
+  .arrow { color: var(--muted); font-size: 20px; }
+  .links { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 28px; }
+  .links a {
+    color: var(--accent); text-decoration: none; font-size: 14px;
+    border: 1px solid var(--line); background: var(--card);
+    padding: 6px 14px; border-radius: 999px;
+  }
+  footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 36px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <h1>Runchang Tian</h1>
+    <p class="tagline">Computer Science &amp; Mathematics · Northeastern University</p>
+    <span class="badge">Co-op available January–September 2027</span>
+  </header>
+
+  <nav class="menu">
+    <a class="item" href="resume.html">
+      <div class="icon">📄</div>
+      <div class="text">
+        <div class="name">Resume</div>
+        <div class="desc">Education, projects, and experience</div>
+      </div>
+      <div class="arrow">›</div>
+    </a>
+
+    <a class="item" href="dianhong.html">
+      <div class="icon">🎤</div>
+      <div class="text">
+        <div class="name">Dianhong Youth Speakers Initiative</div>
+        <div class="desc">Program brochure · 人大附中点虹青年演讲计划</div>
+      </div>
+      <div class="arrow">›</div>
+    </a>
+
+    <a class="item" href="photos.html">
+      <div class="icon">📷</div>
+      <div class="text">
+        <div class="name">Photography</div>
+        <div class="desc">A gallery that grows over time</div>
+      </div>
+      <div class="arrow">›</div>
+    </a>
+
+    <a class="item" href="sudoku.html">
+      <div class="icon">🔢</div>
+      <div class="text">
+        <div class="name">Sudoku</div>
+        <div class="desc">A mini-game I coded. Try to solve it!</div>
+      </div>
+      <div class="arrow">›</div>
+    </a>
+  </nav>
+
+  <div class="links">
+    <a href="mailto:tian.run@northeastern.edu">Email</a>
+    <a href="https://github.com/trc20070226" target="_blank" rel="noopener">GitHub</a>
+  </div>
+
+  <footer>© Runchang Tian</footer>
+</div>
+</body>
+</html>
